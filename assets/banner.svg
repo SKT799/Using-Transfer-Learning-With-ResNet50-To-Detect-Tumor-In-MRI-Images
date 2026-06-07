@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="340" viewBox="0 0 1200 340" role="img" aria-label="Brain Tumor Detection with a fine-tuned ResNet-50">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0A0F1C"/>
+      <stop offset="0.55" stop-color="#0E1A2E"/>
+      <stop offset="1" stop-color="#15123A"/>
+    </linearGradient>
+    <linearGradient id="title" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2DD4BF"/>
+      <stop offset="0.5" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#A855F7"/>
+    </linearGradient>
+    <linearGradient id="s1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3B82F6"/><stop offset="1" stop-color="#2563EB"/></linearGradient>
+    <linearGradient id="s2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2DD4BF"/><stop offset="1" stop-color="#0EA5A4"/></linearGradient>
+    <linearGradient id="s3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A855F7"/><stop offset="1" stop-color="#7C3AED"/></linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#3B82F6" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#3B82F6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="340" rx="18" fill="url(#bg)"/>
+  <circle cx="1020" cy="90" r="230" fill="url(#glow)"/>
+
+  <!-- subtle MRI-viewport corner marks + crosshair, top-right, clear of the title -->
+  <g stroke="#2C4068" stroke-width="2" fill="none" opacity="0.55">
+    <path d="M1000,46 h-22 v22"/><path d="M1126,46 h22 v22"/>
+    <path d="M1000,150 h-22 v-22"/><path d="M1126,150 h22 v-22"/>
+    <circle cx="1063" cy="98" r="30" stroke-dasharray="3 5"/>
+    <path d="M1063,80 v36 M1045,98 h36"/>
+  </g>
+
+  <!-- title block -->
+  <text x="64" y="104" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="50" font-weight="800" fill="url(#title)">Brain Tumor Detection</text>
+  <text x="66" y="146" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="22" font-weight="600" fill="#C7D2FE">Fine-Tuned ResNet-50 &#183; MRI Binary Classifier &#183; Flask + Docker</text>
+  <text x="66" y="178" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="16" font-weight="400" fill="#7E8AB5">A frozen ImageNet backbone, a light trainable head, and an OpenCV contour crop &#8212; served as a web app.</text>
+
+  <!-- divider -->
+  <line x1="64" y1="206" x2="1136" y2="206" stroke="#26304F" stroke-width="1"/>
+
+  <!-- footer: MRI -> crop -> ResNet -> verdict, then a metrics pill -->
+  <g font-family="'Segoe UI',Helvetica,Arial,sans-serif">
+    <!-- stage 1 -->
+    <rect x="64" y="238" width="128" height="64" rx="11" fill="url(#s1)"/>
+    <text x="128" y="268" text-anchor="middle" font-size="14.5" font-weight="700" fill="#FFFFFF">MRI Scan</text>
+    <text x="128" y="287" text-anchor="middle" font-size="10" fill="#DCE8FF">224&#215;224 RGB</text>
+
+    <line x1="192" y1="270" x2="214" y2="270" stroke="#6B76A0" stroke-width="2.2" stroke-dasharray="4 4"/><polygon points="222,270 212,265 212,275" fill="#6B76A0"/>
+
+    <!-- stage 2 -->
+    <rect x="224" y="238" width="146" height="64" rx="11" fill="url(#s2)"/>
+    <text x="297" y="268" text-anchor="middle" font-size="14.5" font-weight="700" fill="#04201F">Contour Crop</text>
+    <text x="297" y="287" text-anchor="middle" font-size="10" fill="#063B3A">OpenCV bbox</text>
+
+    <line x1="370" y1="270" x2="392" y2="270" stroke="#6B76A0" stroke-width="2.2" stroke-dasharray="4 4"/><polygon points="400,270 390,265 390,275" fill="#6B76A0"/>
+
+    <!-- stage 3 -->
+    <rect x="402" y="238" width="176" height="64" rx="11" fill="url(#s3)"/>
+    <text x="490" y="268" text-anchor="middle" font-size="14.5" font-weight="700" fill="#FFFFFF">ResNet-50</text>
+    <text x="490" y="287" text-anchor="middle" font-size="10" fill="#F0E2FF">frozen + custom head</text>
+
+    <line x1="578" y1="270" x2="600" y2="270" stroke="#6B76A0" stroke-width="2.2" stroke-dasharray="4 4"/><polygon points="608,270 598,265 598,275" fill="#6B76A0"/>
+
+    <!-- verdict -->
+    <rect x="610" y="238" width="86" height="64" rx="11" fill="#13283F" stroke="#1E5E46"/>
+    <text x="653" y="266" text-anchor="middle" font-size="14" font-weight="700" fill="#34D399">Tumor?</text>
+    <text x="653" y="287" text-anchor="middle" font-size="11" fill="#34D399">yes / no</text>
+
+    <!-- metrics pill -->
+    <rect x="716" y="238" width="420" height="64" rx="11" fill="#13213F" stroke="#33406B"/>
+    <text x="926" y="266" text-anchor="middle" font-size="13.5" font-weight="600" fill="#D6E0FF">Accuracy 89% &#183; Precision 100%</text>
+    <text x="926" y="288" text-anchor="middle" font-size="11.5" fill="#7E8AB5">Recall 78% &#183; F1 87.6% &#183; validation n = 200</text>
+  </g>
+
+  <rect x="0.5" y="0.5" width="1199" height="339" rx="18" fill="none" stroke="#2A335A" stroke-width="1"/>
+</svg>

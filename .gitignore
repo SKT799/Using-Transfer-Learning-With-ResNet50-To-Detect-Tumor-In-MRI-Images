@@ -1,0 +1,23 @@
+# Secrets — never commit
+.env
+*.env
+
+# Model weights (~96 MB) — host on HF / train locally
+*.pth
+
+# Data — pulled via kagglehub
+dataset/
+
+# Runtime scratch
+uploads/
+__pycache__/
+*.py[cod]
+
+# Local-only / backups
+medical-image.full.ipynb
+output.txt
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/

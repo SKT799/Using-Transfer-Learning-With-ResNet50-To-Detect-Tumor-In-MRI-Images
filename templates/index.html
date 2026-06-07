@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Tumor Detection MRI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2d3748;
+            --primary-light: #4a5568;
+            --accent: #3182ce;
+            --accent-hover: #2b6cb0;
+            --bg: #f7f8fc;
+            --card: #ffffff;
+            --border: #e2e8f0;
+            --text: #1a202c;
+            --text-secondary: #718096;
+            --success: #38a169;
+            --warning: #d69e2e;
+            --error: #e53e3e;
+            --radius: 8px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* ---- Header ---- */
+        .header {
+            background: var(--primary);
+            color: #fff;
+            padding: 28px 0;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .header p {
+            margin-top: 6px;
+            font-size: 0.95rem;
+            color: #cbd5e0;
+        }
+
+        /* ---- Container ---- */
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        /* ---- Mode toggle ---- */
+        .mode-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 28px;
+            padding: 16px;
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .mode-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .mode-label.active {
+            color: var(--accent);
+        }
+
+        .toggle-track {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            background: #cbd5e0;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background 0.25s;
+        }
+
+        .toggle-track.on {
+            background: var(--accent);
+        }
+
+        .toggle-thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.25s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+
+        .toggle-track.on .toggle-thumb {
+            transform: translateX(22px);
+        }
+
+        /* ---- Card ---- */
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 18px;
+            color: var(--primary);
+        }
+
+        /* ---- File upload ---- */
+        .file-drop {
+            border: 2px dashed #a0aec0;
+            border-radius: var(--radius);
+            padding: 38px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f8fafc;
+            margin-top: 8px;
+        }
+
+        .file-drop:hover,
+        .file-drop.drag-over {
+            border-color: var(--accent);
+            background: #ebf4ff;
+            box-shadow: 0 4px 6px rgba(49,130,206,0.1);
+        }
+
+        .file-drop-text {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .file-drop-text strong {
+            color: var(--accent);
+            cursor: pointer;
+        }
+
+        .file-count {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* ---- Buttons ---- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 4px 12px rgba(49,130,206,0.25);
+        }
+
+        .btn-primary:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* ---- Loading ---- */
+        .loading-overlay {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 14px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* ---- Error ---- */
+        .error-box {
+            display: none;
+            background: #fff5f5;
+            border-left: 4px solid var(--error);
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: var(--error);
+        }
+
+        /* ---- Results ---- */
+        .results-section {
+            display: none;
+        }
+        
+        .result-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .result-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .image-preview {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            object-fit: contain;
+            background: var(--bg);
+            margin: 0 auto;
+            display: block;
+        }
+
+        .prediction-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+        }
+
+        .pred-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .pred-result {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .pred-yes { color: var(--error); }
+        .pred-no { color: var(--success); }
+
+        .confidence-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        
+        .confidence-val {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .similarity-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .similarity-label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            width: 80px;
+            text-align: right;
+        }
+
+        .similarity-bar {
+            flex: 1;
+            height: 8px;
+            background: #edf2f7;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .similarity-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+        
+        .fill-yes { background-color: var(--error); }
+        .fill-no { background-color: var(--success); }
+
+        .similarity-val {
+            font-size: 0.85rem;
+            font-weight: 700;
+            width: 50px;
+        }
+
+        /* ---- Default Images Panel ---- */
+        .default-images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .sample-image-card {
+            border: 2px solid transparent;
+            border-radius: var(--radius);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fff;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+        
+        .sample-image-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .sample-image-card.selected {
+            border-color: var(--accent);
+        }
+        
+        .sample-image-card.selected::after {
+            content: "✓";
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--accent);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .sample-img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            display: block;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sample-name {
+            padding: 8px;
+            font-size: 0.8rem;
+            text-align: center;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .panel-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 16px;     
+        }
+        
+        /* ---- Footer / Pipeline ---- */
+        .footer {
+            margin-top: 48px;
+            padding-top: 28px;
+            border-top: 1px solid var(--border);
+            /* Break out of the 960px container to use full viewport */
+            margin-left: -20px;
+            margin-right: -20px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .footer-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .pipeline {
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+            width: 100%;
+            flex-wrap: wrap;         /* wrap on very small screens */
+            justify-content: center;
+        }
+
+        .pipe-block {
+            flex: 1 1 100px;
+            min-width: 100px;
+            padding: 14px 8px;
+            border-radius: 8px;
+            text-align: center;
+            color: #fff;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .pipe-block-title {
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 0.01em;
+            word-break: break-word;
+        }
+
+        .pipe-block-desc {
+            font-size: 0.72rem;
+            opacity: 0.95;
+            line-height: 1.3;
+        }
+
+        .pipe-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            min-width: 18px;
+            flex-shrink: 0;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 700;
+            user-select: none;
+        }
+
+        .pb-input    { background: linear-gradient(135deg, #667eea, #5a67d8); }
+        .pb-preprocess { background: linear-gradient(135deg, #ed8936, #dd6b20); }
+        .pb-resnet    { background: linear-gradient(135deg, #38b2ac, #2c7a7b); }
+        .pb-dense   { background: linear-gradient(135deg, #9f7aea, #805ad5); }
+        .pb-output     { background: linear-gradient(135deg, #48bb78, #2f855a); }
+
+        /* ---- Know More panel ---- */
+        .know-more-btn {
+            display: block;
+            margin: 28px auto 0;
+            padding: 10px 28px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .know-more-btn:hover {
+            background: var(--primary-light);
+        }
+
+        .know-more-btn:active {
+            transform: scale(0.98);
+        }
+
+        .know-more-panel {
+            display: none;
+            margin-top: 24px;
+            background: var(--card);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px;
+            line-height: 1.7;
+        }
+
+        .know-more-panel.open {
+            display: block;
+        }
+
+        .km-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .km-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .km-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        .km-card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .km-card-title::before {
+            content: '';
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .km-card-1::before { background: #ed8936; }
+        .km-card-2::before { background: #38b2ac; }
+        .km-card-3::before { background: #4299e1; }
+
+        .km-card-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .km-card-text strong {
+            color: var(--text);
+        }
+
+        .km-abstract-box {
+            background: #f8fafc;
+            border-left: 4px solid var(--accent);
+            padding: 16px;
+            margin-bottom: 24px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-size: 0.95rem;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 640px) {
+            .container { padding: 16px 12px 40px; }
+            .header h1 { font-size: 1.35rem; }
+            .pipeline { flex-direction: column; align-items: center; }
+            .pipe-arrow { transform: rotate(90deg); width: auto; min-width: auto; height: 24px; }
+            .pipe-block { min-width: 220px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1>Brain Tumor Detection</h1>
+        <p>ResNet-50 powered automated MRI analysis</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- Mode Toggle -->
+        <div class="mode-bar">
+            <span class="mode-label" id="label-upload">Upload Brain Image</span>
+            <div class="toggle-track on" id="mode-toggle">
+                <div class="toggle-thumb"></div>
+            </div>
+            <span class="mode-label active" id="label-default">Use Sample Image</span>
+        </div>
+
+        <div id="error-box" class="error-box"></div>
+
+        <!-- Panel: Upload Custom Image -->
+        <div id="panel-upload" class="card" style="display: none;">
+            <h2 class="card-title">Upload MRI Scan</h2>
+            <div style="background: #fffbe6; border-left: 4px solid var(--warning); padding: 12px 16px; border-radius: 4px; margin-bottom: 20px; font-size: 0.9rem; color: #5c4b12;">
+                <strong>Note:</strong> Please ensure your uploaded file is an MRI Brain Scan similar to the example below. The model will not work correctly on other image types.
+            </div>
+            
+            <div style="text-align: center; margin-bottom: 24px;">
+                <img src="/serve-image/default/yes_1400.jpg" alt="Example MRI" style="max-height: 120px; border-radius: var(--radius); border: 1px solid var(--border);">
+                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px;">Example Valid MRI Format (Axial Plane)</div>
+            </div>
+
+            <form id="upload-form">
+                <div class="file-drop" id="file-drop">
+                    <div class="file-drop-text">
+                        Drag & drop your MRI image here, or <strong>browse</strong>
+                    </div>
+                    <div class="file-count" id="upload-count">Supported formats: JPG, PNG (Max 16MB)</div>
+                    <input type="file" id="file-input" name="image" accept=".jpg,.jpeg,.png">
+                </div>
+                
+                <div style="margin-top: 24px;">
+                    <button type="submit" class="btn btn-primary" id="btn-analyze" disabled>Analyze MRI</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Panel: Default Images -->
+        <div id="panel-default" class="card">
+            <h2 class="card-title">Sample MRI Scans</h2>
+            <p class="panel-desc">Select one of the sample brain MRI scans from the BRATS 2019 dataset to test the model.</p>
+            
+            <div id="default-images-container" class="default-images-grid">
+                <!-- Images injected here -->
+                <div style="color: var(--text-secondary); grid-column: 1/-1;">Loading sample images...</div>
+            </div>
+            
+            <div style="margin-top: 24px;">
+                <button type="button" class="btn btn-primary" id="btn-analyze-default" disabled>Analyze Selected Sample</button>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="loading-overlay">
+            <div class="spinner"></div>
+            <div class="loading-text">Extracting brain contour & running model inference...</div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="results-section">
+            <div class="card">
+                <h2 class="card-title">Analysis Results</h2>
+                
+                <div class="result-layout">
+                    <!-- Left: Image -->
+                    <div>
+                        <img id="result-img" class="image-preview" src="" alt="Analyzed MRI">
+                        <div style="text-align: center; margin-top: 8px; font-size: 0.85rem; color: var(--text-secondary);">
+                            <span id="result-filename-label"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Right: Prediction -->
+                    <div class="prediction-box">
+                        <div id="ground-truth-container" style="display: none; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border);">
+                            <div class="pred-title" style="color: var(--primary);">Actual Ground Truth</div>
+                            <div id="truth-text" class="pred-result" style="font-size: 1.8rem; margin-bottom: 0;">--</div>
+                        </div>
+
+                        <div class="pred-title">Model Prediction</div>
+                        <div id="pred-text" class="pred-result">--</div>
+                        
+                        <div class="confidence-label">Confidence Score</div>
+                        <div id="conf-text" class="confidence-val">--%</div>
+                        
+                        <div style="margin-top: 32px; text-align: left;">
+                            <div style="font-size: 0.9rem; font-weight: 600; margin-bottom: 12px; color: var(--primary);">Class Probabilities</div>
+                            
+                            <!-- Tumor Prob bar -->
+                            <div class="similarity-row">
+                                <span class="similarity-label">Tumor</span>
+                                <div class="similarity-bar">
+                                    <div id="bar-tumor" class="similarity-fill fill-yes" style="width: 0%"></div>
+                                </div>
+                                <span id="val-tumor" class="similarity-val">0%</span>
+                            </div>
+                            
+                            <!-- No Tumor Prob bar -->
+                            <div class="similarity-row">
+                                <span class="similarity-label">No Tumor</span>
+                                <div class="similarity-bar">
+                                    <div id="bar-no-tumor" class="similarity-fill fill-no" style="width: 0%"></div>
+                                </div>
+                                <span id="val-no-tumor" class="similarity-val">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-title">How It Works — Inference Pipeline</div>
+            <div class="pipeline">
+                <div class="pipe-block pb-input">
+                    <div class="pipe-block-title">MRI Input</div>
+                    <div class="pipe-block-desc">Upload or select sample</div>
+                </div>
+                <div class="pipe-arrow">&#10140;</div>
+                <div class="pipe-block pb-preprocess">
+                    <div class="pipe-block-title">Preprocessing</div>
+                    <div class="pipe-block-desc">OpenCV brain contour crop & 224x224 resize</div>
+                </div>
+                <div class="pipe-arrow">&#10140;</div>
+                <div class="pipe-block pb-resnet">
+                    <div class="pipe-block-title">ResNet-50 Features</div>
+                    <div class="pipe-block-desc">Convolutional backbone extracts 2048-dim features</div>
+                </div>
+                <div class="pipe-arrow">&#10140;</div>
+                <div class="pipe-block pb-dense">
+                    <div class="pipe-block-title">Dense Classifier</div>
+                    <div class="pipe-block-desc">Linear(2048&#8594;728) + ReLU + Linear(728&#8594;2)</div>
+                </div>
+                <div class="pipe-arrow">&#10140;</div>
+                <div class="pipe-block pb-output">
+                    <div class="pipe-block-title">Prediction</div>
+                    <div class="pipe-block-desc">Softmax probabilities for Tumor / No Tumor</div>
+                </div>
+            </div>
+
+            <!-- Know More button -->
+            <button class="know-more-btn" onclick="toggleKnowMore()">Know More</button>
+
+            <!-- Know More expandable panel -->
+            <div class="know-more-panel" id="knowMorePanel">
+
+                <div class="km-abstract-box">
+                    <strong>Medical Image Analysis:</strong> This system utilizes deep learning to automatically detect the presence of brain tumors in MRI scans. The underlying model was trained on the BRATS 2019 dataset, pushing state-of-the-art accuracy through targeted image preprocessing and transfer learning.
+                </div>
+
+                <div class="km-grid">
+                    <div class="km-card">
+                        <div class="km-card-title km-card-1">1. Preprocessing Strategy</div>
+                        <div class="km-card-text">
+                            Instead of feeding raw MRI frames into the network, the backend uses <strong>OpenCV</strong> to segment the largest connected contour in the image, successfully cropping out skull regions and empty black borders. This focuses the network purely on the brain matter.
+                        </div>
+                    </div>
+                    
+                    <div class="km-card">
+                        <div class="km-card-title km-card-2">2. ResNet-50 Architecture</div>
+                        <div class="km-card-text">
+                            We use a <strong>ResNet-50</strong> model pre-trained on ImageNet. The core convolutional layers act as extreme feature extractors (identifying edges, textures, and ultimately anomalies). We froze the backbone and fine-tuned a custom dense classification head specifically for tumor identification.
+                        </div>
+                    </div>
+
+                    <div class="km-card">
+                        <div class="km-card-title km-card-3">3. Training & Validation</div>
+                        <div class="km-card-text">
+                            The custom head uses strong Dropout layers (p=0.4) to combat overfitting given the dataset size. It was trained using the <strong>Adam</strong> optimizer with learning rate reduction plateaus, achieving ~99% validation accuracy and F1 score during its original training notebook runs.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+    </div>
+
+    <script>
+        // DOM Elements
+        const modeToggle = document.getElementById('mode-toggle');
+        const labelUpload = document.getElementById('label-upload');
+        const labelDefault = document.getElementById('label-default');
+        const panelUpload = document.getElementById('panel-upload');
+        const panelDefault = document.getElementById('panel-default');
+        
+        const fileDrop = document.getElementById('file-drop');
+        const fileInput = document.getElementById('file-input');
+        const uploadCount = document.getElementById('upload-count');
+        const btnAnalyze = document.getElementById('btn-analyze');
+        
+        const defaultContainer = document.getElementById('default-images-container');
+        const btnAnalyzeDefault = document.getElementById('btn-analyze-default');
+        
+        const loading = document.getElementById('loading');
+        const errorBox = document.getElementById('error-box');
+        const resultsSection = document.getElementById('results-section');
+        
+        const resultImg = document.getElementById('result-img');
+        const resultFilenameLabel = document.getElementById('result-filename-label');
+        const truthContainer = document.getElementById('ground-truth-container');
+        const truthText = document.getElementById('truth-text');
+        const predText = document.getElementById('pred-text');
+        const confText = document.getElementById('conf-text');
+        const barTumor = document.getElementById('bar-tumor');
+        const barNoTumor = document.getElementById('bar-no-tumor');
+        const valTumor = document.getElementById('val-tumor');
+        const valNoTumor = document.getElementById('val-no-tumor');
+        
+        // State
+        let isDefaultMode = true;
+        let selectedFile = null;
+        let selectedDefaultImage = null;
+
+        // Auto load defaults on start
+        window.addEventListener('DOMContentLoaded', () => {
+             if (isDefaultMode) {
+                 fetchDefaultImages();
+             }
+        });
+
+        // ---- Event Listeners: Mode toggle ----
+        modeToggle.addEventListener('click', toggleMode);
+        labelUpload.addEventListener('click', () => { if(isDefaultMode) toggleMode(); });
+        labelDefault.addEventListener('click', () => { if(!isDefaultMode) toggleMode(); });
+
+        function toggleMode() {
+            isDefaultMode = !isDefaultMode;
+            
+            if (isDefaultMode) {
+                modeToggle.classList.add('on');
+                labelUpload.classList.remove('active');
+                labelDefault.classList.add('active');
+                panelUpload.style.display = 'none';
+                panelDefault.style.display = 'block';
+                
+                // Load defaults if not loaded
+                if (defaultContainer.children.length <= 1) {
+                    fetchDefaultImages();
+                }
+            } else {
+                modeToggle.classList.remove('on');
+                labelUpload.classList.add('active');
+                labelDefault.classList.remove('active');
+                panelUpload.style.display = 'block';
+                panelDefault.style.display = 'none';
+            }
+            
+            hideResults();
+            hideError();
+        }
+
+        // ---- Event Listeners: File Upload ----
+        fileDrop.addEventListener('click', () => fileInput.click());
+
+        fileDrop.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileDrop.classList.add('drag-over');
+        });
+
+        fileDrop.addEventListener('dragleave', () => {
+            fileDrop.classList.remove('drag-over');
+        });
+
+        fileDrop.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileDrop.classList.remove('drag-over');
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelect();
+            }
+        });
+
+        fileInput.addEventListener('change', handleFileSelect);
+
+        function handleFileSelect() {
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                uploadCount.innerHTML = `Selected: <strong>${file.name}</strong> (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                btnAnalyze.disabled = false;
+                selectedFile = file;
+            } else {
+                uploadCount.textContent = 'Supported formats: JPG, PNG (Max 16MB)';
+                btnAnalyze.disabled = true;
+                selectedFile = null;
+            }
+            hideResults();
+        }
+
+        // Form Submit (Upload)
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!selectedFile) return;
+
+            const formData = new FormData();
+            formData.append('image', selectedFile);
+
+            executeAnalysis('/upload', formData, false);
+        });
+
+        // Form Submit (Default)
+        btnAnalyzeDefault.addEventListener('click', () => {
+            if (!selectedDefaultImage) return;
+
+            const payload = JSON.stringify({
+                selected_file: selectedDefaultImage
+            });
+
+            executeAnalysis('/load-defaults', payload, true);
+        });
+
+        // ---- Default Images Fetch logic ----
+        async function fetchDefaultImages() {
+            try {
+                const response = await fetch('/list-defaults');
+                const data = await response.json();
+                
+                if (data.success && data.files.length > 0) {
+                    defaultContainer.innerHTML = '';
+                    
+                    data.files.forEach(filename => {
+                        const card = document.createElement('div');
+                        card.className = 'sample-image-card';
+                        
+                        // Set the image src using our explicit route
+                        card.innerHTML = `
+                            <img class="sample-img" src="/serve-image/default/${encodeURIComponent(filename)}" alt="${filename}">
+                            <div class="sample-name" title="${filename}">${filename}</div>
+                        `;
+                        
+                        card.addEventListener('click', () => {
+                            // Deselect all
+                            document.querySelectorAll('.sample-image-card').forEach(c => c.classList.remove('selected'));
+                            
+                            // Select this one
+                            card.classList.add('selected');
+                            selectedDefaultImage = filename;
+                            btnAnalyzeDefault.disabled = false;
+                            hideResults();
+                        });
+                        
+                        defaultContainer.appendChild(card);
+                    });
+                } else {
+                    defaultContainer.innerHTML = '<div style="color: var(--text-secondary); grid-column: 1/-1;">Error loading samples. Directory may be empty.</div>';
+                }
+            } catch (err) {
+                defaultContainer.innerHTML = `<div style="color: var(--error); grid-column: 1/-1;">Error: ${err.message}</div>`;
+            }
+        }
+
+        // ---- Common Execute flow ----
+        async function executeAnalysis(endpoint, payload, isJson) {
+            hideError();
+            hideResults();
+            showLoading(true);
+
+            try {
+                const options = {
+                    method: 'POST',
+                    body: payload
+                };
+                
+                if (isJson) {
+                    options.headers = { 'Content-Type': 'application/json' };
+                }
+
+                const response = await fetch(endpoint, options);
+                const data = await response.json();
+
+                showLoading(false);
+
+                if (data.error) {
+                    showError(data.error);
+                } else {
+                    displayResults(data);
+                }
+            } catch (err) {
+                showLoading(false);
+                showError("A network error occurred: " + err.message);
+            }
+        }
+
+        // ---- Display & UI Handlers ----
+        function showLoading(show) {
+            loading.style.display = show ? 'block' : 'none';
+            if (show) {
+                btnAnalyze.disabled = true;
+                btnAnalyzeDefault.disabled = true;
+            } else {
+                btnAnalyze.disabled = !selectedFile;
+                btnAnalyzeDefault.disabled = !selectedDefaultImage;
+            }
+        }
+
+        function showError(msg) {
+            errorBox.textContent = msg;
+            errorBox.style.display = 'block';
+        }
+
+        function hideError() {
+            errorBox.style.display = 'none';
+        }
+
+        function hideResults() {
+            resultsSection.style.display = 'none';
+        }
+
+        function displayResults(data) {
+            resultsSection.style.display = 'block';
+            
+            // Set image preview correctly
+            resultImg.src = `/serve-image/${data.source}/${encodeURIComponent(data.filename)}`;
+            resultFilenameLabel.textContent = data.filename;
+            
+            // Set Ground Truth if provided
+            if (data.ground_truth) {
+                truthContainer.style.display = 'block';
+                if (data.ground_truth.toLowerCase() === 'yes') {
+                    truthText.textContent = "Tumor";
+                    truthText.className = "pred-result pred-yes";
+                } else {
+                    truthText.textContent = "No Tumor";
+                    truthText.className = "pred-result pred-no";
+                }
+            } else {
+                truthContainer.style.display = 'none';
+            }
+
+            // Set Prediction text and colors
+            const isTumor = data.prediction.toLowerCase() === 'yes';
+            
+            if (isTumor) {
+                predText.textContent = "Tumor Detected";
+                predText.className = "pred-result pred-yes";
+                confText.style.color = "var(--error)";
+            } else {
+                predText.textContent = "No Tumor Detected";
+                predText.className = "pred-result pred-no";
+                confText.style.color = "var(--success)";
+            }
+            
+            confText.textContent = data.confidence.toFixed(2) + "%";
+            
+            // Set probability bars
+            // We use standard requestAnimationFrame pattern for CSS transition
+            barTumor.style.width = '0%';
+            barNoTumor.style.width = '0%';
+            
+            setTimeout(() => {
+                barTumor.style.width = data.tumor_prob + '%';
+                valTumor.textContent = data.tumor_prob.toFixed(1) + '%';
+                
+                barNoTumor.style.width = data.no_tumor_prob + '%';
+                valNoTumor.textContent = data.no_tumor_prob.toFixed(1) + '%';
+            }, 50);
+            
+            // Smooth scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // ---- Know More Toggle ----
+        function toggleKnowMore() {
+            const panel = document.getElementById('knowMorePanel');
+            panel.classList.toggle('open');
+            const btn = document.querySelector('.know-more-btn');
+            if (panel.classList.contains('open')) {
+                btn.textContent = 'Hide Details';
+            } else {
+                btn.textContent = 'Know More';
+            }
+        }
+        
+    </script>
+</body>
+</html>
