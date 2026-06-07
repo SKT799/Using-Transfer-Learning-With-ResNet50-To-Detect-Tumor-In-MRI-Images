@@ -109,12 +109,12 @@ The frozen backbone is doing the heavy lifting — it already knows edges, textu
 
 Training ran for 22 epochs before early stopping, with the best validation accuracy — **89%** — landing at epoch 12. The `ReduceLROnPlateau` scheduler stepped the learning rate down four times (`1e-4 → 5e-5 → 2.5e-5 → 1.25e-5 → …`) as validation accuracy plateaued, which is exactly the late-training fine-tuning behaviour you want to see.
 
-| Metric (tumor class) | Value |
-|---|:---:|
-| Validation accuracy | **89.0%** |
-| Precision | **100.0%** |
-| Recall | **78.0%** |
-| F1-score | **87.6%** |
+| Metric (tumor class) | Value | What it means |
+|---|:---:|---|
+| Validation accuracy | **89.0%** | overall, on 200 scans |
+| Precision | **100.0%** | never false-alarms on a healthy scan |
+| **Recall** | **78.0%** | ⚠️ **misses ~1 in 5 real tumors — the flaw that matters most** |
+| F1-score | **87.6%** | precision/recall balance |
 
 On the 200-image validation set, that breaks down as:
 
@@ -124,11 +124,13 @@ On the 200-image validation set, that breaks down as:
    Actual: yes          22              78          ← 22 tumors missed
 ```
 
-### The honest read
+### The major flaw — recall is the number that matters, and it's the weak one
 
-That **100% precision** looks great, and in one sense it is: the model never once cried wolf — not a single healthy scan was flagged as a tumor. But precision isn't the number that matters most for a screening tool. **Recall is.** A 78% recall means roughly **one in five real tumors slipped through as "no."** For a tool whose whole job is to *not miss* disease, that's the failure mode that counts, and the confusion matrix above is where I'd point anyone evaluating this.
+> ⚠️ **The model misses about 1 in 5 real tumors (recall = 78%).** For a screening tool whose entire job is to *not miss* disease, this — not the 89% accuracy, not the 100% precision — is the headline. A **false negative** (a real tumor reported as "no") is the most costly mistake this model can make, and it makes it **22% of the time**.
 
-So this is an honest 89%, not a cherry-picked one. The path to better recall is clear — a higher decision threshold toward the tumor class, a recall-weighted loss, more (and harder) tumor examples, and a validation set bigger than 200 — and that's the direction the project points next, rather than pretending the headline accuracy is the whole story.
+That **100% precision** looks great, and in one sense it is: the model never once cried wolf — not a single healthy scan was flagged as a tumor. But precision is the *cheap* win here. **Recall is what counts.** Those **22 false negatives** in the confusion matrix above — 22 patients with a tumor told "no" — are exactly the cases a diagnostic aid must never get wrong, and they're why the honest takeaway from this project is its weakest metric, not its strongest.
+
+So this is an honest 89%, not a cherry-picked one. The path to better recall is clear — a decision threshold shifted toward the tumor class, a recall-weighted (or focal) loss, more and harder tumor examples, and a validation set far bigger than 200 — and that's the direction the project points next, rather than pretending the headline accuracy is the whole story.
 
 ---
 
