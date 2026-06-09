@@ -10,7 +10,7 @@ A ResNet-50 pretrained on ImageNet, frozen, with a small custom head trained on 
 
 <br/>
 
-[![Run the Web App](https://img.shields.io/badge/Run_the-Web_App-009688?style=for-the-badge&logo=flask&logoColor=white)]([#run-the-web-app](https://huggingface.co/spaces/satyam2025/Brain-Tumor-Detection-MRI))
+[![Run the Web App](https://huggingface.co/spaces/satyam2025/Brain-Tumor-Detection-MRI)
 &nbsp;
 
 <br/>
