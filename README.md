@@ -12,7 +12,6 @@ A ResNet-50 pretrained on ImageNet, frozen, with a small custom head trained on 
 
 [![Run the Web App](https://img.shields.io/badge/Run_the-Web_App-009688?style=for-the-badge&logo=flask&logoColor=white)](#run-the-web-app)
 &nbsp;
-[![View Source Code](https://img.shields.io/badge/View-Source_Code-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/SKT799/Using-Transfer-Learning-With-ResNet50-To-Detect-Tumor-In-MRI-Images)
 
 <br/>
 
@@ -23,7 +22,6 @@ A ResNet-50 pretrained on ImageNet, frozen, with a small custom head trained on 
 ![Flask](https://img.shields.io/badge/Flask-web_app-000000?style=flat-square&logo=flask&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-HF_Spaces-2496ED?style=flat-square&logo=docker&logoColor=white)
 ![Accuracy](https://img.shields.io/badge/val_accuracy-89%25-2EA043?style=flat-square)
-![License](https://img.shields.io/badge/License-Educational-blue?style=flat-square)
 
 </div>
 
