@@ -10,9 +10,6 @@ A ResNet-50 pretrained on ImageNet, frozen, with a small custom head trained on 
 
 <br/>
 
-[![Run the Web App](https://huggingface.co/spaces/satyam2025/Brain-Tumor-Detection-MRI)
-&nbsp;
-
 <br/>
 
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)
