@@ -129,39 +129,6 @@ So this is an honest 89%, not a cherry-picked one. The path to better recall is 
 
 ---
 
-## Run the web app
-
-The repo ships a Flask UI: upload an MRI, or click one of the bundled sample scans, and get a verdict with confidence and per-class probabilities.
-
-```bash
-pip install -r requirements.txt
-python app.py            # serves on http://localhost:5000
-```
-
-> **Note on the weights.** The trained `best_brain_tumor_model.pth` (~96 MB) is **not** committed here — model binaries don't belong in git. Train it yourself with the notebook (it saves to that path), or drop your own `.pth` in the project root before launching. Without it, the app starts but inference won't run.
-
-### In a container
-
-```bash
-docker build -t brain-tumor-detection .
-docker run -p 7860:7860 brain-tumor-detection      # http://localhost:7860
-```
-
-The [`Dockerfile`](Dockerfile) uses CPU-only PyTorch wheels to keep the image lean and targets port `7860`, so it deploys to **Hugging Face Spaces** as-is. [`deploy_to_hf.py`](deploy_to_hf.py) pushes the app there — set your own `HF_TOKEN` in a local `.env` (which is git-ignored) and your own username/space name first.
-
----
-
-## Reproduce the training
-
-Everything is in [`medical-image.ipynb`](medical-image.ipynb) (committed with outputs stripped to keep it light). It downloads the BRATS-2019 set via `kagglehub`, builds the augmentation pipeline, trains the head, and produces the full visual suite: sample batch, class distribution, loss/accuracy curves, a performance dashboard, the confusion matrix, a prediction gallery, and a step-by-step contour-crop demo.
-
-```bash
-pip install torch torchvision matplotlib seaborn scikit-learn tqdm opencv-python pillow kagglehub
-# then run medical-image.ipynb top to bottom
-```
-
----
-
 ## Where things live
 
 ```
@@ -182,7 +149,7 @@ Not in the repo, on purpose: the `.env` (HF token), `best_brain_tumor_model.pth`
 
 ## A word of caution
 
-This is a learning and research project, not a medical device. It's trained on a small public dataset, it misses about a fifth of tumors, and it should never be used to make a real diagnosis. Read it as a clean, end-to-end example of transfer learning plus classical CV preprocessing, deployed properly — nothing more.
+This is a learning and research project, not a medical device. It's trained on a small public dataset, it misses about a fifth of tumors, and it should never be used to make a real diagnosis.
 
 <div align="center">
 
